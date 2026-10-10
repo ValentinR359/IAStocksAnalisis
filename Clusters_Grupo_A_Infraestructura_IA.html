@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Grupo A — Infraestructura de la IA · Mapa de clusters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EDF1F4;--paper:#FFFFFF;--ink:#142033;--muted:#5B6B7F;--line:#D3DCE5;
+  --teal:#0E6E6E;--teal-soft:#DDEFEE;--amber:#A86F0C;--amber-soft:#F7ECD6;
+  --up:#1D7A46;--up-soft:#E2F2E8;--dn:#B23A3A;--dn-soft:#F7E3E3;
+  --st0:#F3E6CF;--st0i:#7A4F0A;--st1:#D9EFE9;--st1i:#0D5C4E;--st2:#DCE7F5;--st2i:#1D4F8C;--st3:#F2DFDA;--st3i:#8A3424;
+  --radius-lg:14px;--radius-sm:7px;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#121A23;--paper:#1A2430;--ink:#E7EDF3;--muted:#9AA9B9;--line:#2C3947;
+  --teal:#5FC4BE;--teal-soft:#183533;--amber:#E2B15A;--amber-soft:#3A2E17;
+  --up:#6BCB92;--up-soft:#173325;--dn:#E68A8A;--dn-soft:#3A1E1E;
+  --st0:#3A2E17;--st0i:#E9C78A;--st1:#173B33;--st1i:#8FDCC8;--st2:#1B2C44;--st2i:#9EC0EA;--st3:#3B2420;--st3i:#EDB1A3;
+}}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16px;line-height:1.55}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.wrap{max-width:1080px;margin:0 auto;padding:28px 20px 48px}
+header h1{font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-weight:700;font-size:clamp(28px,4.5vw,44px);line-height:1.05;margin:0;letter-spacing:-0.01em}
+header p{color:var(--muted);max-width:68ch;margin:10px 0 0;font-size:15px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+nav.clusters{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:26px 0 18px}
+nav.clusters button{all:unset;cursor:pointer;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius-lg);padding:12px 14px;display:block}
+nav.clusters button[aria-selected="true"]{border-color:var(--teal);box-shadow:inset 0 -3px 0 var(--teal)}
+nav.clusters button:focus-visible,.co:focus-visible,.tab:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.cname{font-weight:600;font-size:15px;line-height:1.25}
+.cpot{display:inline-block;margin-top:6px;font-size:12px;font-weight:500;padding:2px 9px;border-radius:20px;background:var(--amber-soft);color:var(--amber)}
+.cpot.top{background:var(--up-soft);color:var(--up)}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px 22px}
+.panel h2{font-family:"IBM Plex Sans Condensed",sans-serif;font-size:26px;margin:0;line-height:1.1}
+.note{color:var(--muted);margin:8px 0 0;max-width:72ch;font-size:15px}
+.pipe{display:grid;gap:0;margin-top:20px;overflow-x:auto}
+.stage{padding:0 10px;position:relative}
+.stage+.stage{border-left:1px dashed var(--line)}
+.stage h3{font-size:13px;font-weight:600;margin:0 0 10px;padding:4px 10px;border-radius:20px;display:inline-block}
+.stage .list{display:flex;flex-direction:column;gap:8px}
+.co{all:unset;cursor:pointer;border:1px solid var(--line);border-radius:var(--radius-sm);padding:9px 11px;background:var(--bg);display:block}
+.co[aria-pressed="true"]{border-color:var(--teal);background:var(--teal-soft)}
+.tk{font-family:"IBM Plex Sans Condensed",sans-serif;font-weight:700;font-size:18px;line-height:1}
+.nm{font-size:12px;color:var(--muted);margin-top:3px}
+.badges{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.bd{font-size:11px;font-weight:500;padding:1px 7px;border-radius:20px}
+.r-sb{background:var(--up-soft);color:var(--up)}.r-b{background:var(--teal-soft);color:var(--teal)}
+.r-h{background:var(--bg);color:var(--muted);border:1px solid var(--line)}.r-sp{background:var(--amber-soft);color:var(--amber)}
+.port{background:var(--ink);color:var(--paper)}
+.detail{margin-top:18px;border-top:1px solid var(--line);padding-top:18px}
+.dhead{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px}
+.dhead .tk{font-size:30px}
+.dhead .full{color:var(--muted);font-size:15px}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 16px}
+.tab{all:unset;cursor:pointer;font-size:14px;padding:6px 13px;border-radius:20px;border:1px solid var(--line);color:var(--muted)}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.body{max-width:76ch}
+.body p{margin:0;font-size:15.5px;line-height:1.7}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.box{border:1px solid var(--line);border-radius:var(--radius-sm);padding:12px 14px}
+.box h4{margin:0 0 8px;font-size:14px}
+.box ul,.chk{margin:0;padding:0;list-style:none}
+.box li,.chk li{font-size:14.5px;padding:7px 0;border-top:1px solid var(--line)}
+.box li:first-child,.chk li:first-child{border-top:none}
+.pro h4{color:var(--up)}.con h4{color:var(--dn)}
+.chk li{display:flex;gap:10px}
+.chk li::before{content:"";flex:0 0 8px;height:8px;margin-top:8px;border-radius:2px;background:var(--teal)}
+.sens{border:1px solid var(--line);border-radius:var(--radius-sm);margin-bottom:10px;overflow:hidden}
+.sens h4{margin:0;font-size:14.5px;padding:9px 12px;background:var(--bg)}
+.sens .row{display:grid;grid-template-columns:1fr 1fr}
+.sens .row div{padding:9px 12px;font-size:14px}
+.sens .row div+div{border-left:1px solid var(--line)}
+.u{color:var(--up);font-weight:600}.d{color:var(--dn);font-weight:600}
+footer{margin-top:22px;font-size:12.5px;color:var(--muted);max-width:80ch}
+@media (max-width:760px){
+  nav.clusters{grid-template-columns:1fr 1fr}
+  .pipe{grid-template-columns:1fr !important}
+  .stage+.stage{border-left:none;border-top:1px dashed var(--line);padding-top:12px;margin-top:12px}
+  .cols,.sens .row{grid-template-columns:1fr}
+  .sens .row div+div{border-left:none;border-top:1px solid var(--line)}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Infraestructura de la IA</h1>
+  <p>Grupo A de 3 · Cuatro clusters que forman la columna física del buildout de IA: los chips, la luz que los conecta, las redes y la energía que los alimenta. Elige un cluster, luego una empresa dentro de su cadena de valor.</p>
+  <div class="legend">
+    <span><i class="dot" style="background:var(--up)"></i>Strong Buy</span>
+    <span><i class="dot" style="background:var(--teal)"></i>Buy</span>
+    <span><i class="dot" style="background:var(--muted)"></i>Hold / mixto</span>
+    <span><i class="dot" style="background:var(--amber)"></i>Especulativo</span>
+    <span><i class="dot" style="background:var(--ink)"></i>En cartera</span>
+  </div>
+</header>
+
+<nav class="clusters" id="clusters" role="tablist" aria-label="Clusters"></nav>
+<section class="panel" id="panel" aria-live="polite"></section>
+
+<footer>Material educativo, octubre 2026. Ratings = consenso aproximado de fuentes públicas consultadas (jun–sep 2026), no recomendación personalizada. Verificar precios, ratings y fechas de reporte antes de cualquier decisión.</footer>
+</div>
+
+<script>
+const RT={sb:["Strong Buy","r-sb"],b:["Buy","r-b"],h:["Hold / mixto","r-h"],sp:["Especulativo","r-sp"]};
+const TABS=[["tesis","Tesis"],["pc","Pros y contras"],["cuidar","Qué cuidar"],["sens","Sensibilidad"],["entrada","Entrada"]];
+const DATA=[
+{name:"IA + Chips + Memoria",pot:"Alto",top:false,
+note:"Líder absoluto de 2026, pero muy concentrado: los semis explicaron casi todo el avance tech del año. Mejor esperar retrocesos que perseguir precio.",
+stages:["Diseño","Manufactura","Memoria"],
+cos:[
+{t:"NVDA",n:"NVIDIA",s:0,r:"sb",p:1,
+tesis:"NVIDIA vende el motor de la IA: GPUs, red de alta velocidad (NVLink) y el software CUDA. No vende un chip, vende el data center completo. Controla alrededor del 80% de los aceleradores de IA, y su crecimiento depende del CapEx de los hyperscalers, que siguió subiendo en 2026.",
+pros:["CUDA crea un costo de cambio enorme para los clientes","Poder de precio y márgenes brutos muy altos","Vende plataforma completa: chips, red y software"],
+contras:["Depende de 4 o 5 hyperscalers","Chips a medida (TPU, Trainium) le quitan parte de la inferencia","Restricciones de exportación a China","Su peso en los índices amplifica cualquier caída"],
+cuidar:["Guidance de revenue de data center","Margen bruto trimestral","Comentarios de CapEx de Amazon, Microsoft, Google y Meta","Rampa de cada nueva generación de GPU"],
+sens:[["CapEx de hyperscalers","Re-rating al alza; arrastra a todo el sector","Caída fuerte, es la primera en sentirlo"],["Adopción de chips a medida (ASIC)","Pierde participación en inferencia","Consolida su dominio"],["Restricciones a China","Pierde un mercado relevante","Recupera ventas, sorpresa positiva"]],
+entrada:["Ya en cartera: agregar solo en retroceso a MA50 diaria","Diario sobre MA200 como condición mínima","No agregar en la semana de earnings","Confirmar con SMH: si el sector rompe soporte, esperar"]},
+{t:"AVGO",n:"Broadcom",s:0,r:"sb",p:0,
+tesis:"Broadcom diseña chips a medida (ASIC) para Google, Meta y OpenAI, y vende los switches Ethernet que conectan los clusters. Gana cada vez que un hyperscaler busca depender menos de NVIDIA.",
+pros:["Dos motores: chips a medida y redes","Contratos multianuales con gigantes tecnológicos","El software de VMware genera caja estable"],
+contras:["Pocos clientes concentran el negocio a medida","Su guidance mueve a todo el sector: en junio provocó una caída fuerte de los semis","Deuda por la compra de VMware"],
+cuidar:["Anuncios de nuevos clientes ASIC","Guidance de revenue de IA cada trimestre","Márgenes operativos","Avance de sus switches Tomahawk"],
+sens:[["Adopción de chips a medida","Principal beneficiario","Depende más de redes y software"],["CapEx de hyperscalers","Sube su backlog de diseños","Pedidos se posponen"],["Tasas de interés","Encarece su deuda","Alivio financiero"]],
+entrada:["Diario sobre MA200","Sus earnings son evento de riesgo para todo el sector","Entrar después del reporte, no antes","Fundamental: guidance de IA al alza"]},
+{t:"AMD",n:"AMD",s:0,r:"b",p:0,
+tesis:"AMD es la alternativa principal a NVIDIA en GPUs (MI350, MI400) y líder en CPUs de servidor EPYC. Su acuerdo con Meta para hasta 6 GW de GPUs valida que los clientes quieren un segundo proveedor.",
+pros:["Validación con clientes grandes como Meta","Sus CPUs siguen ganando participación a Intel","Precio más bajo atrae a quien quiere diversificar"],
+contras:["Su software (ROCm) está detrás de CUDA","Riesgo de ejecución en cada rampa nueva","Beta alta: amplifica movimientos del sector"],
+cuidar:["Rampa de MI400","Pedidos de Meta y Microsoft","Participación en servidores","Margen bruto"],
+sens:[["Escasez de chips NVIDIA","Gana pedidos por desbordamiento","Clientes regresan a NVIDIA"],["CapEx de hyperscalers","Sube más que el promedio","Cae más que el promedio"],["Calidad de su software","Reduce la brecha con CUDA","Limita su adopción"]],
+entrada:["Solo con tendencia diaria confirmada sobre MA200","Tamaño menor que NVDA por volatilidad","Buscar retroceso a MA50","Fundamental: revenue de data center creciendo"]},
+{t:"TSM",n:"TSMC",s:1,r:"b",p:1,
+tesis:"TSMC fabrica más del 90% de los chips avanzados del mundo. Gana sin importar quién gane entre NVIDIA, AMD o los chips a medida: todos fabrican con ella.",
+pros:["Monopolio práctico en nodos de 3nm y 2nm","Neutral: gana con todos los diseñadores","Poder de precio en capacidad escasa"],
+contras:["Riesgo geopolítico Taiwán-China","CapEx enorme cada año","Sujeta al ciclo de semiconductores"],
+cuidar:["Ventas mensuales (se publican cada mes)","Capacidad de empaquetado avanzado CoWoS","Guidance de margen","Tensiones en el estrecho de Taiwán"],
+sens:[["Tensión geopolítica","Caída por prima de riesgo","Re-rating al alza"],["Demanda de chips de IA","Utilización alta y mejores márgenes","Capacidad ociosa"],["Dólar taiwanés","Fuerte presiona márgenes en USD","Débil mejora márgenes"]],
+entrada:["Ya en cartera: usar ventas mensuales como termómetro","Diario sobre MA200","Agregar en retrocesos por ruido geopolítico si los fundamentales siguen intactos","No sobreponderar por concentración en Taiwán"]},
+{t:"ASML",n:"ASML",s:1,r:"b",p:0,
+tesis:"ASML es la única empresa que fabrica máquinas de litografía EUV, indispensables para chips avanzados. Si no hay máquina ASML, no hay chip de última generación.",
+pros:["Monopolio absoluto en EUV","Backlog de varios años","Nueva generación High-NA amplía su ventaja"],
+contras:["Restricciones de exportación a China","Pedidos irregulares trimestre a trimestre","Depende del CapEx de TSMC, Samsung e Intel"],
+cuidar:["Bookings (órdenes nuevas)","Reglas de exportación de EE.UU. y Países Bajos","Adopción de High-NA EUV","Guidance anual"],
+sens:[["CapEx de fabricantes de chips","Más órdenes, más backlog","Órdenes se retrasan"],["Restricciones a China","Pierde ventas","Recupera mercado"],["Euro vs dólar","Euro fuerte afecta conversión","Euro débil favorece"]],
+entrada:["Sus órdenes anticipan el ciclo 12-18 meses","Diario sobre MA200","Entrar tras bookings sólidos","Evitar en semanas de noticias regulatorias"]},
+{t:"MU",n:"Micron",s:2,r:"sb",p:0,
+tesis:"Micron fabrica la memoria HBM que va montada junto a cada GPU de IA. La IA convirtió un negocio históricamente cíclico en uno con demanda estructural: la HBM tiene más demanda que oferta.",
+pros:["HBM con demanda mayor que la oferta","Único productor de HBM en EE.UU.","Márgenes en expansión"],
+contras:["La memoria sigue siendo cíclica en el fondo","Competencia de SK Hynix y Samsung","Corrigió en julio tras un rally fuerte"],
+cuidar:["Precio de DRAM y HBM","KOSPI como alerta temprana (SK Hynix y Samsung)","CapEx de la industria de memoria","Inventarios de clientes"],
+sens:[["Precio de memoria","Expansión fuerte de margen","Compresión rápida de utilidades"],["Capacidad de competidores","Más oferta, presión en precios","Escasez sostiene precios"],["KOSPI / memoria coreana","Anticipa buen trimestre","Alerta de debilidad"]],
+entrada:["Revisar KOSPI y EWY antes de entrar","Diario sobre MA200 tras la corrección","Entrar en soporte confirmado, no en caída","Fundamental: precio de HBM estable o subiendo"]}
+]},
+{name:"Fotónica",pot:"Muy alto",top:true,
+note:"El cuello de botella pasó de las GPUs a la luz. NVIDIA invirtió $4B en Lumentum y Coherent y la capacidad de láser está vendida hasta 2027. El cluster de mayor potencial del mapa.",
+stages:["Láseres","Módulos / DSP","Manufactura"],
+cos:[
+{t:"LITE",n:"Lumentum",s:0,r:"sb",p:0,
+tesis:"Lumentum fabrica láseres de fosfuro de indio, la pieza más escasa de un transceptor óptico. Si el módulo 800G/1.6T es un foco, Lumentum fabrica el filamento. Con co-packaged optics (CPO) los láseres externos se vuelven aún más críticos. NVIDIA invirtió $2B y su capacidad está vendida hasta FY2027.",
+pros:["Capacidad agotada da poder para fijar precios","NVIDIA como socio y cliente ancla","Tres motores: transceptores, switches ópticos y CPO"],
+contras:["Pocos clientes concentran las ventas","La óptica históricamente es ciclo de auge y caída","Tras el rally, la valuación descuenta mucho optimismo"],
+cuidar:["Expansiones de capacidad: más oferta puede bajar precios","Margen bruto trimestre a trimestre","Entregas de pedidos CPO para 2027","Inventario acumulado en clientes"],
+sens:[["CapEx de hyperscalers","Más pedidos, re-rating","Beta alta: de las primeras en caer"],["Oferta de láseres en la industria","Presión en precio y margen","Sigue fijando precios"],["Adopción de CPO","Mercado mucho mayor desde 2027","Depende solo de transceptores"]],
+entrada:["Diario sobre MA200 y MA50 con pendiente positiva","Retroceso a MA50 o Fibonacci 38-50%, no en gap","Evitar la semana de earnings","Fundamental: margen bruto estable o subiendo"]},
+{t:"COHR",n:"Coherent",s:0,r:"b",p:0,
+tesis:"Coherent es el supermercado de la fotónica: transceptores 800G/1.6T, láseres, materiales y negocio industrial. También recibió $2B de NVIDIA con acuerdos de suministro multianuales.",
+pros:["Diversificación reduce riesgo de un solo producto","Escala de manufactura difícil de replicar","Valuación más razonable del grupo"],
+contras:["Negocio industrial de menor crecimiento diluye la tesis","Deuda heredada de adquisiciones","Ejecución compleja en muchos segmentos"],
+cuidar:["% de revenue de datacom","Rampa de módulos 1.6T","Reducción de deuda neta","Margen por segmento"],
+sens:[["CapEx de hyperscalers","Sube su segmento más rentable","Cae menos que LITE"],["Ciclo industrial","Ayuda a láseres industriales","Arrastra la parte no IA"],["Tasas de interés","Más costo de deuda","Alivio en intereses"]],
+entrada:["Diario sobre MA200","Mejor perfil para mediano plazo","Entrar en consolidación sobre MA50","Fundamental: deuda bajando y datacom creciendo"]},
+{t:"CRDO",n:"Credo",s:1,r:"sb",p:0,
+tesis:"Credo hace los chips que controlan la señal (DSPs) y los cables eléctricos activos (AEC) que conectan servidores a corta distancia: el puente entre cobre y óptica. Compró DustPhotonics y apunta a más de $500M de revenue óptico en FY2027.",
+pros:["Crecimiento muy alto y revisiones de EPS al alza","Expansión de margen al sumar óptica","Sus productos reducen consumo de energía"],
+contras:["Pocos clientes grandes","Volatilidad extrema después de earnings","Si la óptica reemplaza al cobre más rápido, sus AEC pierden peso"],
+cuidar:["Concentración de clientes","Avance real del revenue óptico","Nuevas familias de producto","Guidance trimestral"],
+sens:[["Velocidad de transición cobre a óptica","Necesita escalar óptica rápido","Sus AEC siguen dominando"],["CapEx de hyperscalers","Subidas violentas","Caídas violentas"],["Ganar o perder un cliente grande","Re-rating inmediato","Desplome por concentración"]],
+entrada:["Solo con diario sobre MA200 confirmado","Tamaño reducido por volatilidad","Nunca antes de earnings","Fundamental: diversificación de clientes"]},
+{t:"MRVL",n:"Marvell",s:1,r:"b",p:0,
+tesis:"Marvell tiene dos motores: DSPs ópticos 1.6T (el cerebro de cada módulo óptico) y chips a medida para AWS (Trainium) y Microsoft (Maia). El 74% de sus ventas ya es data center.",
+pros:["Dos motores dentro del mismo boom","Relación profunda con AWS","Líder en DSPs ópticos"],
+contras:["Dependencia de AWS en chips a medida","Compite con Broadcom por clientes","Negocios no data center crecen lento"],
+cuidar:["Pedidos de Trainium y Maia","% data center","Competencia con AVGO","Rampa de DSP 1.6T"],
+sens:[["Pedidos de AWS","Impulso al negocio a medida","Golpe por concentración"],["Ciclo de módulos ópticos","Más DSPs vendidos","Menos volumen"],["Avance de Broadcom","Pierde diseños","Gana diseños"]],
+entrada:["Diario sobre MA200","Suele seguir a AVGO","Entrar tras reporte positivo de AWS","Fundamental: % data center subiendo"]},
+{t:"FN",n:"Fabrinet",s:2,r:"b",p:0,
+tesis:"Fabrinet ensambla en Tailandia los módulos que diseñan NVIDIA, Lumentum y Coherent. No inventa, fabrica con precisión. Reportó revenue récord de $1.133B (+36%), con $833M en comunicaciones ópticas.",
+pros:["Sin riesgo de investigación y desarrollo","Menor volatilidad que LITE o CRDO","Socio de manufactura clave de NVIDIA"],
+contras:["Alta concentración en NVIDIA","Márgenes de manufactura más bajos","Riesgo geográfico en Tailandia"],
+cuidar:["% de ventas a NVIDIA","Margen operativo","Clientes que internalicen producción","Quién ensambla en la era CPO"],
+sens:[["Volumen de NVIDIA","Más módulos para ensamblar","Golpe directo"],["Transición a CPO","Más valor por unidad si conserva el ensamble","Pierde negocio si se integra en fábricas de chips"],["Baht vs dólar","Baht fuerte encarece costos","Baht débil mejora margen"]],
+entrada:["Diario sobre MA200","La forma defensiva de tener fotónica","Entradas en pullbacks moderados","Fundamental: diversificación más allá de NVIDIA"]},
+{t:"AAOI",n:"Applied Optoelectronics",s:1,r:"sp",p:0,
+tesis:"Applied Optoelectronics diseña y fabrica módulos ópticos 800G. Es la apuesta elástica del grupo: planea escalar a 400 mil módulos al mes hacia fines de 2027. Si consigue volumen con hyperscalers puede multiplicarse; si no, sufre.",
+pros:["La mayor elasticidad del grupo","Manufactura propia","Un contrato grande cambia la historia"],
+contras:["Historial de pérdidas y ejecución irregular","Riesgo de dilución","Muy pocos clientes"],
+cuidar:["Envíos en volumen a hyperscalers","Ejecución del plan de capacidad","Caja y emisión de acciones","Margen bruto"],
+sens:[["Pedido grande de hyperscaler","Disparo de doble dígito","Castigo fuerte"],["Ejecución de capacidad","Credibilidad y re-rating","Desconfianza y caída"],["Mercado de capitales","Se financia sin castigo","Diluye en mal momento"]],
+entrada:["Solo con tendencia diaria clara","Posición chica","Nunca promediar a la baja","Fundamental: envíos en volumen confirmados"]}
+]},
+{name:"Redes + Comunicaciones",pot:"Alto",top:false,
+note:"Conectar miles de GPUs dentro del data center (switches) y data centers entre sí (óptica de larga distancia y fibra). Sin redes, las GPUs no trabajan juntas.",
+stages:["Switching DC","Óptica entre DCs","Fibra"],
+cos:[
+{t:"ANET",n:"Arista Networks",s:0,r:"sb",p:0,
+tesis:"Arista fabrica switches Ethernet de alto rendimiento para clusters de IA. Planea duplicar su revenue de IA a $3.25B en 2026 porque Ethernet le está ganando terreno a InfiniBand como estándar para conectar GPUs.",
+pros:["Margen EBITDA cercano a 49%","Clientes como Microsoft y Meta","Nuevos clientes en neoclouds y creadores de modelos"],
+contras:["Concentración en Microsoft y Meta","El costo de memoria puede presionar su margen bruto","NVIDIA también vende Ethernet (Spectrum-X)"],
+cuidar:["Revenue de IA vs meta","Nuevos clientes que pesen más del 10%","Margen bruto (piso guiado ~62%)","Comentarios de CapEx de Meta y Microsoft"],
+sens:[["Adopción de Ethernet vs InfiniBand","Gana participación","NVIDIA retiene el estándar"],["CapEx de hyperscalers","Más pedidos de switches","Pedidos se posponen"],["Costo de memoria","Presión en margen","Alivio en margen"]],
+entrada:["Diario sobre MA200","Sentimiento mixto = oportunidad si confirma guidance","Entrar después del reporte","Fundamental: margen sobre el piso guiado"]},
+{t:"CSCO",n:"Cisco",s:0,r:"b",p:0,
+tesis:"Cisco es el incumbente de redes empresariales, con una capa de datos y seguridad gracias a Splunk. Su tesis es un ciclo de renovación de redes de campus más pedidos de IA de alrededor de $3B.",
+pros:["Dividendo sólido","Negocio diversificado","Valuación moderada"],
+contras:["Crecimiento lento, cerca de 5%","Perdió participación frente a Arista","Transición a software todavía en curso"],
+cuidar:["Pedidos de IA","Integración de Splunk","Margen operativo","Ciclo de renovación empresarial"],
+sens:[["Gasto en TI empresarial","Ciclo de renovación acelera","Empresas posponen compras"],["Pedidos de IA","Re-rating como jugador de IA","Se queda como acción de valor"],["Tasas de interés","Presión en múltiplo","Atractivo por dividendo"]],
+entrada:["Perfil defensivo dentro de redes","Diario sobre MA200","Entradas en soporte con dividendo como colchón","Fundamental: pedidos de IA creciendo"]},
+{t:"CIEN",n:"Ciena",s:1,r:"b",p:0,
+tesis:"Ciena hace la óptica de larga distancia que une data centers entre sí. Ganó proyectos con tres de los cuatro grandes hyperscalers y guía revenue de $5.9B a $6.3B para el fiscal 2026.",
+pros:["Ganador claro en interconexión entre data centers","Tecnología coherente líder","Backlog visible"],
+contras:["Rally muy extendido","Parte telecom tradicional crece lento","Competencia de Nokia tras comprar Infinera"],
+cuidar:["Guidance anual","Pedidos de cloud","Márgenes","Valuación vs crecimiento"],
+sens:[["Interconexión entre data centers","Más proyectos multianuales","Proyectos se retrasan"],["Gasto de telecom","Ayuda al negocio tradicional","Arrastra crecimiento"],["Competencia de Nokia","Presión en precios","Mantiene liderazgo"]],
+entrada:["Esperar consolidación tras el rally","Diario sobre MA200","Entrar en retroceso a MA50","Fundamental: pedidos de cloud sostenidos"]},
+{t:"NOK",n:"Nokia",s:1,r:"h",p:0,
+tesis:"Nokia combina redes móviles con óptica tras comprar Infinera. Elevó su perspectiva de data center a un crecimiento de 35-40%, pero la mayor parte de su negocio sigue siendo telecom tradicional.",
+pros:["Valuación baja","Exposición nueva a óptica de data center","Dividendo"],
+contras:["Telecom 5G crece poco","Integración de Infinera","Poco momentum"],
+cuidar:["Revenue de data center","Integración de Infinera","Márgenes","Gasto de operadores"],
+sens:[["Demanda óptica de data centers","Re-rating como jugador de IA","Se queda como telecom"],["Gasto de operadores 5G","Mejora negocio base","Presión continua"],["Euro vs dólar","Afecta conversión","Favorece"]],
+entrada:["Jugada de valor, no de momentum","Solo con cambio de tendencia en diario","Posición chica","Fundamental: data center ganando peso"]},
+{t:"GLW",n:"Corning",s:2,r:"b",p:0,
+tesis:"Corning fabrica fibra óptica y vidrio especializado. Cada data center nuevo necesita kilómetros de fibra, y Corning es proveedor físico de todos, con menos dependencia del ciclo de chips.",
+pros:["Proveedor de todos los jugadores","Menor beta que fotónica pura","Contratos con hyperscalers"],
+contras:["Negocio de vidrio para consumo es cíclico","Crecimiento más moderado","Competencia asiática en fibra"],
+cuidar:["Revenue de comunicaciones ópticas","Contratos con hyperscalers","Vidrio para pantallas","Márgenes"],
+sens:[["Construcción de data centers","Más fibra vendida","Menor demanda"],["Consumo de electrónica","Ayuda al vidrio","Arrastra resultados"],["Capacidad de fibra global","Presión en precios","Precios firmes"]],
+entrada:["Exposición a IA con menor volatilidad","Diario sobre MA200","Entradas en pullbacks","Fundamental: óptica creciendo como % del total"]}
+]},
+{name:"Energía + Nuclear + Infra",pot:"Alto",top:false,
+note:"Las utilities tradicionales quedaron rezagadas en 2026 pese a la demanda de IA. El upside está en nuclear y en el equipo eléctrico que llega hasta el data center.",
+stages:["Combustible","Generación","Grid y equipo"],
+cos:[
+{t:"CCJ",n:"Cameco",s:0,r:"b",p:0,
+tesis:"Cameco extrae el uranio que alimenta los reactores. Produce alrededor del 15% del uranio mundial; si la demanda nuclear crece por IA y descarbonización, el precio del uranio sube y Cameco se mueve más que el mercado.",
+pros:["Productor maduro con minas operando","Contratos de largo plazo con utilities","Socio en Westinghouse (reactores)"],
+contras:["Depende del precio del uranio","Riesgo operativo en minas","Geopolítica de Rusia y Kazajistán"],
+cuidar:["Precio spot del uranio (UX1!)","Contratos nuevos de largo plazo","Producción trimestral","Construcción de reactores en China"],
+sens:[["Precio del uranio","Expansión de margen","Presión en utilidades"],["Nuevos reactores aprobados","Demanda estructural mayor","Tesis se retrasa"],["Oferta rusa/kazaja","Restricciones favorecen a Cameco","Más competencia"]],
+entrada:["Uranio arriba de $90/lb es viento a favor","Diario sobre MA200","Revisar URA como confirmación","Fundamental: contratos a precios crecientes"]},
+{t:"CEG",n:"Constellation",s:1,r:"b",p:0,
+tesis:"Constellation opera 22 reactores en EE.UU. y es el mayor operador nuclear privado. Firmó contratos de 20 años con Microsoft y Meta porque los data centers necesitan energía limpia 24 horas.",
+pros:["Energía nuclear operando hoy","Contratos de largo plazo con hyperscalers","Precio de energía al alza"],
+contras:["Riesgo regulatorio (NRC)","Dependencia de créditos fiscales","Valuación elevada tras el rally"],
+cuidar:["Nuevos contratos (PPAs) con tecnológicas","Extensiones de vida de reactores","Precio de electricidad en PJM","Cambios en créditos IRA"],
+sens:[["Contratos con hyperscalers","Re-rating del precio objetivo","Pierde narrativa IA"],["Precio de electricidad","Más margen en ventas libres","Menor rentabilidad"],["Créditos fiscales","Mejor visibilidad","Golpe a rentabilidad"]],
+entrada:["Diario sobre MA200","Entrar tras confirmación de nuevo PPA","Evitar perseguir subidas por noticias","Fundamental: contratos de largo plazo creciendo"]},
+{t:"OKLO",n:"Oklo",s:1,r:"sp",p:0,
+tesis:"Oklo desarrolla reactores modulares pequeños (SMR) para alimentar data centers sin construir una planta gigante. Tiene contrato con Meta y pilotos con el DOE, pero todavía no genera ingresos.",
+pros:["Tecnología de próxima generación","Contrato con Meta","Respaldo de figuras como Sam Altman"],
+contras:["Sin ingresos","Aprobación regulatoria pendiente","Riesgo de dilución","Analistas divididos: consenso alcista vs Guggenheim en $0"],
+cuidar:["Aprobación de la NRC","Calendario del reactor Aurora","Quema de caja","Emisión de acciones"],
+sens:[["Aprobación NRC","Disparo fuerte","Riesgo existencial"],["Interés de hyperscalers","Más contratos","Narrativa se enfría"],["Mercado de capitales","Se financia fácil","Dilución dolorosa"]],
+entrada:["Máximo 1-2% del portafolio","Solo con tendencia diaria clara","Nunca promediar a la baja","Evento clave: decisión de la NRC"]},
+{t:"GEV",n:"GE Vernova",s:2,r:"sb",p:1,
+tesis:"GE Vernova fabrica turbinas de gas y equipo de transmisión. Es la única que genera y transmite energía a escala industrial, y tiene un backlog récord de $163B.",
+pros:["Backlog récord que da visibilidad de años","Turbinas de gas con alta demanda por data centers","Recompras de acciones"],
+contras:["El negocio eólico sigue débil","Valuación exigente","Riesgo de ejecución en entregas"],
+cuidar:["Pedidos de turbinas de gas","Evolución del backlog","Margen del segmento Power","Pérdidas en Wind"],
+sens:[["Demanda eléctrica por IA","Más pedidos y precios","Backlog se estanca"],["Margen de Power","Re-rating","Presión en múltiplo"],["Negocio eólico","Mejora la mezcla","Arrastra utilidades"]],
+entrada:["Ya en cartera: tesis confirmada","Agregar en retroceso a MA50 diaria","Vigilar backlog cada trimestre","No agregar antes de earnings"]},
+{t:"ETN",n:"Eaton",s:2,r:"b",p:1,
+tesis:"Eaton fabrica switches, transformadores y sistemas UPS que van dentro de los data centers. Con tiempos de espera de 2-3 años en transformadores, su backlog está asegurado.",
+pros:["Lead times largos aseguran ingresos","Diversificado: data centers, industrial, aeroespacial","Ejecución consistente"],
+contras:["Valuación premium","Si los lead times bajan, la demanda se normaliza","Exposición a ciclo industrial"],
+cuidar:["Revenue de Electrical Americas","Lead times de transformadores","% de pedidos de data centers","Márgenes por segmento"],
+sens:[["Construcción de data centers","Backlog crece","Pedidos se normalizan"],["Lead times","Largos = poder de precio","Cortos = demanda cediendo"],["Ciclo industrial","Impulso extra","Freno parcial"]],
+entrada:["Ya en cartera","Agregar en retrocesos a MA50","Vigilar Electrical Americas","Fundamental: backlog estable o creciendo"]},
+{t:"VRT",n:"Vertiv",s:2,r:"b",p:0,
+tesis:"Vertiv fabrica sistemas de enfriamiento y energía de precisión para data centers de IA. Los chips de IA generan calor extremo; cada GPU nueva necesita más enfriamiento. Es 100% data center.",
+pros:["Exposición pura al buildout de IA","Clientes en todos los hyperscalers","Enfriamiento líquido en adopción acelerada"],
+contras:["Sin diversificación: si el ciclo frena, cae fuerte","Competencia de Schneider Electric","Beta alta"],
+cuidar:["Crecimiento de revenue trimestral","Nuevos contratos con hyperscalers","Margen de servicios vs hardware","Competencia en enfriamiento líquido"],
+sens:[["CapEx de data centers","Sube más que el sector","Cae más que el sector"],["Adopción de enfriamiento líquido","Mayor valor por proyecto","Menos diferenciación"],["Competencia","Presión en precios","Mantiene liderazgo"]],
+entrada:["Diario sobre MA200","Tamaño moderado por beta alta","Entrar en retroceso tras reporte sólido","Fundamental: backlog y margen creciendo"]}
+]}
+];
+let ci=0,co=0,tb="tesis";
+const $=s=>document.querySelector(s);
+function renderClusters(){
+  $("#clusters").innerHTML=DATA.map((c,i)=>`<button role="tab" aria-selected="${i===ci}" onclick="pickCluster(${i})"><div class="cname">${c.name}</div><span class="cpot${c.top?" top":""}">Potencial ${c.pot.toLowerCase()}</span></button>`).join("");
+}
+function renderPanel(){
+  const c=DATA[ci];
+  const cols=c.stages.length;
+  const stagesHtml=c.stages.map((s,si)=>{
+    const items=c.cos.map((x,k)=>({x,k})).filter(o=>o.x.s===si).map(({x,k})=>`<button class="co" aria-pressed="${k===co}" onclick="pickCo(${k})"><div class="tk">${x.t}</div><div class="nm">${x.n}</div><div class="badges"><span class="bd ${RT[x.r][1]}">${RT[x.r][0]}</span>${x.p?'<span class="bd port">En cartera</span>':""}</div></button>`).join("");
+    return `<div class="stage"><h3 style="background:var(--st${si});color:var(--st${si}i)">${s}</h3><div class="list">${items}</div></div>`;
+  }).join("");
+  $("#panel").innerHTML=`<h2>${c.name}</h2><p class="note">${c.note}</p><div class="pipe" style="grid-template-columns:repeat(${cols},minmax(180px,1fr))">${stagesHtml}</div><div class="detail" id="detail"></div>`;
+  renderDetail();
+}
+function renderDetail(){
+  const x=DATA[ci].cos[co];
+  let body="";
+  if(tb==="tesis")body=`<p>${x.tesis}</p>`;
+  if(tb==="pc")body=`<div class="cols"><div class="box pro"><h4>Pros</h4><ul>${x.pros.map(i=>`<li>${i}</li>`).join("")}</ul></div><div class="box con"><h4>Contras</h4><ul>${x.contras.map(i=>`<li>${i}</li>`).join("")}</ul></div></div>`;
+  if(tb==="cuidar")body=`<ul class="chk">${x.cuidar.map(i=>`<li>${i}</li>`).join("")}</ul>`;
+  if(tb==="sens")body=x.sens.map(s=>`<div class="sens"><h4>${s[0]}</h4><div class="row"><div><span class="u">Si sube:</span> ${s[1]}</div><div><span class="d">Si baja:</span> ${s[2]}</div></div></div>`).join("");
+  if(tb==="entrada")body=`<ul class="chk">${x.entrada.map(i=>`<li>${i}</li>`).join("")}</ul>`;
+  $("#detail").innerHTML=`<div class="dhead"><span class="tk">${x.t}</span><span class="full">${x.n}</span><span class="bd ${RT[x.r][1]}">${RT[x.r][0]}</span>${x.p?'<span class="bd port">En cartera</span>':""}</div><div class="tabs" role="tablist">${TABS.map(t=>`<button class="tab" role="tab" aria-selected="${t[0]===tb}" onclick="pickTab('${t[0]}')">${t[1]}</button>`).join("")}</div><div class="body">${body}</div>`;
+}
+function pickCluster(i){ci=i;co=0;renderClusters();renderPanel();}
+function pickCo(k){co=k;renderPanel();}
+function pickTab(t){tb=t;renderDetail();}
+renderClusters();renderPanel();
+</script>
+</body>
+</html>
